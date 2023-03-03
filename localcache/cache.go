@@ -1,5 +1,5 @@
 // Package local_cache provides the functionality of storing any data in memory
-package local_cache
+package localcache
 
 import (
 	"sync"
