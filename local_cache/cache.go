@@ -1,5 +1,5 @@
-// Package localcache provides the functionality of storing any data in memory
-package localcache
+// Package go-local-cache provides the functionality of storing any data in memory
+package local_cache
 
 import (
 	"sync"

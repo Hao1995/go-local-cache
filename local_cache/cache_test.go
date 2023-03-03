@@ -1,4 +1,4 @@
-package localcache
+package local_cache
 
 import (
 	"testing"
