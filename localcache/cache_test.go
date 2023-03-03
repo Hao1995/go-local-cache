@@ -15,6 +15,19 @@ func TestCacheGetNilIfDataNotExist(t *testing.T) {
 	assert.Nil(t, value)
 }
 
+func TestCacheSetDataSuccessfully(t *testing.T) {
+	cache := New(1)
+
+	value, ok := cache.Get("key")
+	assert.False(t, ok)
+	assert.Nil(t, value)
+
+	cache.Set("key", "value")
+	value, ok = cache.Get("key")
+	assert.True(t, ok)
+	assert.Equal(t, "value", value)
+}
+
 func TestCacheSetDifferentDataTypeSuccessfully(t *testing.T) {
 	testCases := []struct {
 		name string
