@@ -1,4 +1,4 @@
-// Package go-local-cache provides the functionality of storing any data in memory
+// Package local_cache provides the functionality of storing any data in memory
 package local_cache
 
 import (
@@ -15,7 +15,7 @@ type Cache interface {
 // localCache implements the Cache interface using a map.
 type localCache struct {
 	data map[string]interface{}
-	ttl  int
+	ttl  time.Duration
 	mu   sync.Mutex
 }
 
@@ -34,7 +34,7 @@ func (c *localCache) Set(key string, value interface{}) {
 	defer c.mu.Unlock()
 
 	c.data[key] = value
-	time.AfterFunc(time.Duration(c.ttl)*time.Second, func() {
+	time.AfterFunc(c.ttl*time.Second, func() {
 		c.mu.Lock()
 		defer c.mu.Unlock()
 
@@ -43,7 +43,7 @@ func (c *localCache) Set(key string, value interface{}) {
 }
 
 // New creates a new instance of the localCache.
-func New(ttl int) Cache {
+func New(ttl time.Duration) Cache {
 	return &localCache{
 		data: make(map[string]interface{}),
 		ttl:  ttl,
