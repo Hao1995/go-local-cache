@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestCache_GetNilIfDataNotExist(t *testing.T) {
+func TestCacheGetNilIfDataNotExist(t *testing.T) {
 	cache := New(1)
 
 	value, ok := cache.Get("key")
@@ -15,7 +15,7 @@ func TestCache_GetNilIfDataNotExist(t *testing.T) {
 	assert.Nil(t, value)
 }
 
-func TestCache_SetDifferentDataTypeSuccessfully(t *testing.T) {
+func TestCacheSetDifferentDataTypeSuccessfully(t *testing.T) {
 	testCases := []struct {
 		name string
 		key  string
@@ -44,7 +44,7 @@ func TestCache_SetDifferentDataTypeSuccessfully(t *testing.T) {
 	}
 }
 
-func TestCache_CheckKeyCanBeEdited(t *testing.T) {
+func TestCacheCheckKeyCanBeEdited(t *testing.T) {
 	cache := New(1)
 
 	cache.Set("key", "value")
@@ -58,7 +58,7 @@ func TestCache_CheckKeyCanBeEdited(t *testing.T) {
 	assert.Equal(t, "new value", value)
 }
 
-func TestCache_Expiration(t *testing.T) {
+func TestCacheExpiration(t *testing.T) {
 	cache := New(1)
 
 	cache.Set("key", "value")
