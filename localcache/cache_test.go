@@ -4,31 +4,37 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/suite"
 )
 
-func TestCacheGetNilIfDataNotExist(t *testing.T) {
-	cache := New(1)
+const (
+	EXPIRATION_TTL = 1
+)
 
-	value, ok := cache.Get("key")
-	assert.False(t, ok)
-	assert.Nil(t, value)
+type localCacheSuite struct {
+	suite.Suite
+	localcache *localCache
 }
 
-func TestCacheSetDataSuccessfully(t *testing.T) {
-	cache := New(1)
+func (s *localCacheSuite) SetupSuite() {}
 
-	value, ok := cache.Get("key")
-	assert.False(t, ok)
-	assert.Nil(t, value)
-
-	cache.Set("key", "value")
-	value, ok = cache.Get("key")
-	assert.True(t, ok)
-	assert.Equal(t, "value", value)
+func (s *localCacheSuite) SetupTest() {
+	s.localcache = New(EXPIRATION_TTL).(*localCache)
+	s.localcache.data = make(map[string]interface{})
 }
 
-func TestCacheSetDifferentDataTypeSuccessfully(t *testing.T) {
+func (s *localCacheSuite) TearDownSuite() {}
+
+func (s *localCacheSuite) TearDownTest() {}
+
+func (s *localCacheSuite) TestCacheGetNilIfDataNotExist() {
+	value, ok := s.localcache.Get("key")
+
+	s.False(ok)
+	s.Nil(value)
+}
+
+func (s *localCacheSuite) TestCacheSetDifferentDataTypeSuccessfully() {
 	testCases := []struct {
 		name string
 		key  string
@@ -45,41 +51,36 @@ func TestCacheSetDifferentDataTypeSuccessfully(t *testing.T) {
 		}{"Alice", 30}},
 	}
 
-	cache := New(1)
-
 	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
-			cache.Set(tc.key, tc.val)
-			value, ok := cache.Get(tc.key)
-			assert.True(t, ok)
-			assert.Equal(t, tc.val, value)
-		})
+		s.localcache.Set(tc.key, tc.val)
+
+		value, ok := s.localcache.data[tc.key]
+		s.True(ok)
+		s.Equal(tc.val, value)
 	}
 }
 
-func TestCacheCheckKeyCanBeEdited(t *testing.T) {
-	cache := New(1)
+func (s *localCacheSuite) TestCacheCheckKeyCanBeEdited() {
+	s.localcache.data = map[string]interface{}{
+		"key": "v1 value",
+	}
 
-	cache.Set("key", "value")
-	value, ok := cache.Get("key")
-	assert.True(t, ok)
-	assert.Equal(t, "value", value)
+	s.localcache.Set("key", "v2 value")
 
-	cache.Set("key", "new value")
-	value, ok = cache.Get("key")
-	assert.True(t, ok)
-	assert.Equal(t, "new value", value)
+	s.Equal("v2 value", s.localcache.data["key"])
 }
 
-func TestCacheExpiration(t *testing.T) {
-	cache := New(1)
+func (s *localCacheSuite) TestCacheExpiration() {
+	s.localcache.Set("key", "value")
 
-	cache.Set("key", "value")
-	value, ok := cache.Get("key")
-	assert.True(t, ok)
-	assert.Equal(t, "value", value)
-	time.Sleep(2 * time.Second)
+	s.Equal("value", s.localcache.data["key"])
 
-	_, ok = cache.Get("key")
-	assert.False(t, ok)
+	time.Sleep((EXPIRATION_TTL + 1) * time.Second)
+
+	_, ok := s.localcache.data["key"]
+	s.False(ok)
+}
+
+func TestLocalcacheSuite(t *testing.T) {
+	suite.Run(t, new(localCacheSuite))
 }
