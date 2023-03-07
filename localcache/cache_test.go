@@ -30,8 +30,8 @@ func (s *localCacheSuite) TearDownTest() {}
 func (s *localCacheSuite) TestCacheGetNilIfDataNotExist() {
 	value, ok := s.localcache.Get("key")
 
-	s.False(ok)
-	s.Nil(value)
+	s.Require().False(ok)
+	s.Require().Nil(value)
 }
 
 func (s *localCacheSuite) TestCacheSetDifferentDataTypeSuccessfully() {
@@ -55,8 +55,8 @@ func (s *localCacheSuite) TestCacheSetDifferentDataTypeSuccessfully() {
 		s.localcache.Set(tc.key, tc.val)
 
 		value, ok := s.localcache.data[tc.key]
-		s.True(ok)
-		s.Equal(tc.val, value)
+		s.Require().True(ok)
+		s.Require().Equal(tc.val, value)
 	}
 }
 
@@ -67,18 +67,18 @@ func (s *localCacheSuite) TestCacheCheckKeyCanBeEdited() {
 
 	s.localcache.Set("key", "v2 value")
 
-	s.Equal("v2 value", s.localcache.data["key"])
+	s.Require().Equal("v2 value", s.localcache.data["key"])
 }
 
 func (s *localCacheSuite) TestCacheExpiration() {
 	s.localcache.Set("key", "value")
 
-	s.Equal("value", s.localcache.data["key"])
+	s.Require().Equal("value", s.localcache.data["key"])
 
 	time.Sleep((EXPIRATION_TTL + 1) * time.Second)
 
 	_, ok := s.localcache.data["key"]
-	s.False(ok)
+	s.Require().False(ok)
 }
 
 func TestLocalcacheSuite(t *testing.T) {
